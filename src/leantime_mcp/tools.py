@@ -169,6 +169,20 @@ TOOLS = [
         }
     ),
     Tool(
+        name="delete_ticket",
+        description="Delete a ticket by ID.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "ticket_id": {
+                    "type": "integer",
+                    "description": "ID of the ticket to delete"
+                }
+            },
+            "required": ["ticket_id"]
+        }
+    ),
+    Tool(
         name="get_status_labels",
         description="Get all available ticket status labels with their IDs. Use this to find out what status ID corresponds to what status name (e.g., Open, In Progress, Done, etc.)",
         inputSchema={
