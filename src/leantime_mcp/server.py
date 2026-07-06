@@ -144,14 +144,6 @@ async def update_ticket(ticket_id: int, project_id: int, headline: str = None, d
 
 
 @app.tool()
-async def delete_ticket(ticket_id: int) -> str:
-    """Delete a ticket by ID."""
-    client = get_client()
-    result = await client.delete_ticket(ticket_id)
-    return json.dumps(result, indent=2)
-
-
-@app.tool()
 async def get_status_labels() -> str:
     """Get available status labels."""
     client = get_client()
