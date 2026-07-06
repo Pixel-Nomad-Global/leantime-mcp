@@ -158,15 +158,19 @@ class LeantimeClient:
     
     async def update_ticket(self, ticket_id: int, project_id: int, **kwargs) -> dict:
         """Update an existing ticket.
-        
+
+        Fetches the current ticket first and merges changes on top so that
+        unspecified fields are not reset to API defaults.
+
         Args:
             ticket_id: The ID of the ticket to update
             project_id: The project ID where the ticket belongs
-            **kwargs: Additional parameters to update
+            **kwargs: Fields to update — only these change, everything else is preserved
         """
         if 'assignedTo' in kwargs:
             kwargs['editorId'] = kwargs.pop('assignedTo')
-        values = {"id": ticket_id, "projectId": project_id, **kwargs}
+        current = await self.get_ticket(ticket_id)
+        values = {**current, "id": ticket_id, "projectId": project_id, **kwargs}
         params = {"values": values}
         return await self.call("leantime.rpc.Tickets.Tickets.updateTicket", params)
 
