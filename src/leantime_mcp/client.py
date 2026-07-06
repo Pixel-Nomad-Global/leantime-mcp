@@ -139,8 +139,10 @@ class LeantimeClient:
             date = datetime.now().strftime("%Y-%m-%d")
         
         # The API expects a 'values' parameter containing the ticket data
+        if 'assignedTo' in kwargs:
+            kwargs['editorId'] = kwargs.pop('assignedTo')
         values = {
-            "headline": headline, 
+            "headline": headline,
             "projectId": project_id,
             "userId": user_id,
             "date": date,
@@ -162,6 +164,8 @@ class LeantimeClient:
             project_id: The project ID where the ticket belongs
             **kwargs: Additional parameters to update
         """
+        if 'assignedTo' in kwargs:
+            kwargs['editorId'] = kwargs.pop('assignedTo')
         values = {"id": ticket_id, "projectId": project_id, **kwargs}
         params = {"values": values}
         return await self.call("leantime.rpc.Tickets.Tickets.updateTicket", params)
@@ -273,14 +277,16 @@ class LeantimeClient:
         milestone_id = parent_ticket_data.get("milestoneid")
         
         # The API expects a 'values' parameter containing the subtask data
+        if 'assignedTo' in kwargs:
+            kwargs['editorId'] = kwargs.pop('assignedTo')
         values = {
             "headline": headline,
-            "type": "subtask",  # Mark this as a subtask
+            "type": "subtask",
             "projectId": project_id,
             "userId": user_id,
             "date": date,
-            "dependingTicketId": parent_ticket_id,  # Link to parent ticket
-            "milestoneid": milestone_id if milestone_id else "",  # Use parent's milestone
+            "dependingTicketId": parent_ticket_id,
+            "milestoneid": milestone_id if milestone_id else "",
             **kwargs
         }
         
