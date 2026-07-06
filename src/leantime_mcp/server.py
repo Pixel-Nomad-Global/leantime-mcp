@@ -121,11 +121,10 @@ async def create_ticket(headline: str, project_id: int, user_id: int, date: str 
 
 
 @app.tool()
-async def update_ticket(ticket_id: int, project_id: int, headline: str = None, description: str = None, 
-                       status: int = None, priority: str = None, assignedTo: int = None) -> str:
+async def update_ticket(ticket_id: int, project_id: int, headline: str = None, description: str = None,
+                       status: int = None, priority: str = None, assignedTo: int = None, tags: str = None) -> str:
     """Update an existing ticket."""
     client = get_client()
-    # Build kwargs from non-None parameters
     kwargs = {}
     if headline is not None:
         kwargs['headline'] = headline
@@ -137,8 +136,18 @@ async def update_ticket(ticket_id: int, project_id: int, headline: str = None, d
         kwargs['priority'] = priority
     if assignedTo is not None:
         kwargs['assignedTo'] = assignedTo
-    
+    if tags is not None:
+        kwargs['tags'] = tags
+
     result = await client.update_ticket(ticket_id, project_id, **kwargs)
+    return json.dumps(result, indent=2)
+
+
+@app.tool()
+async def delete_ticket(ticket_id: int) -> str:
+    """Delete a ticket by ID."""
+    client = get_client()
+    result = await client.delete_ticket(ticket_id)
     return json.dumps(result, indent=2)
 
 

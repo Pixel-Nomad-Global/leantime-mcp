@@ -159,9 +159,27 @@ TOOLS = [
                 "assignedTo": {
                     "type": "integer",
                     "description": "New assignee user ID"
+                },
+                "tags": {
+                    "type": "string",
+                    "description": "Comma-separated tags (e.g. 'sla, blocker, compliance')"
                 }
             },
             "required": ["ticket_id", "project_id"]
+        }
+    ),
+    Tool(
+        name="delete_ticket",
+        description="Delete a ticket by ID.",
+        inputSchema={
+            "type": "object",
+            "properties": {
+                "ticket_id": {
+                    "type": "integer",
+                    "description": "ID of the ticket to delete"
+                }
+            },
+            "required": ["ticket_id"]
         }
     ),
     Tool(

@@ -169,6 +169,10 @@ class LeantimeClient:
         values = {"id": ticket_id, "projectId": project_id, **kwargs}
         params = {"values": values}
         return await self.call("leantime.rpc.Tickets.Tickets.updateTicket", params)
+
+    async def delete_ticket(self, ticket_id: int) -> dict:
+        """Delete a ticket by ID."""
+        return await self.call("leantime.rpc.Tickets.Tickets.deleteTicket", {"id": ticket_id})
     
     async def get_status_labels(self) -> dict:
         """Get all available ticket status labels with their IDs.
