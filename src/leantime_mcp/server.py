@@ -107,15 +107,15 @@ async def list_tickets(project_id: int = None) -> str:
 
 
 @app.tool()
-async def create_ticket(headline: str, project_id: int, user_id: int, date: str = None, 
+async def create_ticket(headline: str, project_id: int, user_id: int, date: str = None,
                        description: str = None, status: str = None, priority: str = None,
-                       assignedTo: str = None, tags: str = None) -> str:
-    """Create a new ticket."""
+                       assignedTo: str = None, tags: str = None, type: str = None) -> str:
+    """Create a new ticket. Pass type='milestone' to create a milestone instead of a regular task."""
     client = get_client()
     result = await client.create_ticket(
         headline=headline, project_id=project_id, user_id=user_id, date=date,
         description=description, status=status, priority=priority,
-        assignedTo=assignedTo, tags=tags
+        assignedTo=assignedTo, tags=tags, type=type
     )
     return json.dumps(result, indent=2)
 

@@ -199,11 +199,17 @@ class LeantimeClient:
         return await self.call("leantime.rpc.Users.Users.getUserByEmail", {"email": email})
     
     async def add_comment(self, module: str, module_id: int, comment: str) -> dict:
-        """Add a comment to a module (e.g., ticket, project)."""
+        """Add a comment to a module (e.g., ticket, project).
+
+        Leantime's Comments::addComment($values, $module, $entityId, $entity = null)
+        binds RPC params by reflection parameter name, so the payload must use
+        "values"/"module"/"entityId" (not "comment"/"moduleId") and $values must
+        carry the text under a "text" key.
+        """
         params = {
+            "values": {"text": comment},
             "module": module,
-            "moduleId": module_id,
-            "comment": comment
+            "entityId": module_id
         }
         return await self.call("leantime.rpc.Comments.addComment", params)
     
