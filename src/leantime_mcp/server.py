@@ -109,21 +109,25 @@ async def list_tickets(project_id: int = None) -> str:
 @app.tool()
 async def create_ticket(headline: str, project_id: int, user_id: int, date: str = None,
                        description: str = None, status: str = None, priority: str = None,
-                       assignedTo: str = None, tags: str = None, type: str = None) -> str:
-    """Create a new ticket. Pass type='milestone' to create a milestone instead of a regular task."""
+                       assignedTo: str = None, tags: str = None, type: str = None,
+                       dateToFinish: str = None) -> str:
+    """Create a new ticket. Pass type='milestone' to create a milestone instead of a regular task.
+    dateToFinish is the due date, YYYY-MM-DD."""
     client = get_client()
+    extra = {"dateToFinish": dateToFinish} if dateToFinish else {}
     result = await client.create_ticket(
         headline=headline, project_id=project_id, user_id=user_id, date=date,
         description=description, status=status, priority=priority,
-        assignedTo=assignedTo, tags=tags, type=type
+        assignedTo=assignedTo, tags=tags, type=type, **extra
     )
     return json.dumps(result, indent=2)
 
 
 @app.tool()
 async def update_ticket(ticket_id: int, project_id: int, headline: str = None, description: str = None,
-                       status: int = None, priority: str = None, assignedTo: int = None, tags: str = None) -> str:
-    """Update an existing ticket."""
+                       status: int = None, priority: str = None, assignedTo: int = None, tags: str = None,
+                       dateToFinish: str = None) -> str:
+    """Update an existing ticket. dateToFinish is the due date, YYYY-MM-DD."""
     client = get_client()
     kwargs = {}
     if headline is not None:
@@ -138,6 +142,8 @@ async def update_ticket(ticket_id: int, project_id: int, headline: str = None, d
         kwargs['assignedTo'] = assignedTo
     if tags is not None:
         kwargs['tags'] = tags
+    if dateToFinish is not None:
+        kwargs['dateToFinish'] = dateToFinish
 
     result = await client.update_ticket(ticket_id, project_id, **kwargs)
     return json.dumps(result, indent=2)
