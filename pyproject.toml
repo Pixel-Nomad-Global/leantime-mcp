@@ -19,6 +19,13 @@ authors = [
     { name = "Daniel Eder" }
 ]
 
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
 [project.scripts]
 leantime-mcp = "leantime_mcp.server:main"
 

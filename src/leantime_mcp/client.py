@@ -156,23 +156,26 @@ class LeantimeClient:
         params = {"values": values}
         return await self.call("leantime.rpc.Tickets.Tickets.addTicket", params)
     
-    async def update_ticket(self, ticket_id: int, project_id: int, **kwargs) -> dict:
-        """Update an existing ticket.
+    async def update_ticket(self, ticket_id: int, project_id: Optional[int] = None, **kwargs) -> Any:
+        """Update an existing ticket: only the fields given change.
 
-        Fetches the current ticket first and merges changes on top so that
-        unspecified fields are not reset to API defaults.
+        Uses Leantime's patchTicket. The older updateTicket call sends the whole
+        ticket and sets the created date (`date`) to now on every edit
+        (Leantime Services/Tickets.php updateTicket). patchTicket writes only the
+        patchable columns given, keeps `date`, and records ticket history.
 
         Args:
             ticket_id: The ID of the ticket to update
-            project_id: The project ID where the ticket belongs
-            **kwargs: Fields to update — only these change, everything else is preserved
+            project_id: Kept for compatibility; patchTicket finds the project itself
+            **kwargs: Fields to update. assignedTo maps to editorId. date
+                (YYYY-MM-DD HH:MM:SS) only to restore a lost created date.
         """
         if 'assignedTo' in kwargs:
             kwargs['editorId'] = kwargs.pop('assignedTo')
-        current = await self.get_ticket(ticket_id)
-        values = {**current, "id": ticket_id, "projectId": project_id, **kwargs}
-        params = {"values": values}
-        return await self.call("leantime.rpc.Tickets.Tickets.updateTicket", params)
+        if not kwargs:
+            raise ValueError("update_ticket needs at least one field to change")
+        params = {"id": ticket_id, "values": kwargs}
+        return await self.call("leantime.rpc.Tickets.Tickets.patchTicket", params)
 
     async def delete_ticket(self, ticket_id: int) -> dict:
         """Delete a ticket by ID."""
