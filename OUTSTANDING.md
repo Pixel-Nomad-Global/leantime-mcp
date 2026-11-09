@@ -8,8 +8,8 @@ Standard it enforces: project-knowledge `standards/leantime-tickets.md` (draft P
 
 ## Phase 0. Fix what is broken now
 
-- [x] 0.1 `update_ticket` uses `patchTicket` with only the changed fields, so the created date is kept and ticket history is written. Built 9 Nov (this branch). **Live check after merge:** reconnect `/mcp`, change one field on one ticket, confirm `date` did not move.
-- [ ] 0.2 Restore the created dates of the 24 tickets edited on 9 Nov with `update_ticket(created_date=...)`. Backup: `~/Documents/pixel-nomad/internal/infra/leantime_original_dates_2026-11-09.tsv`. One ticket first, then the rest.
+- [x] 0.1 `update_ticket` uses `patchTicket` with only the changed fields, so the created date is kept and ticket history is written. Built 9 Nov (this branch). Live check 9 Nov: tags re-sent on #846, `date` did not move.
+- [x] 0.2 Restore the created dates of the 24 tickets edited on 9 Nov with `update_ticket(created_date=...)`. Backup: `~/Documents/pixel-nomad/internal/infra/leantime_original_dates_2026-11-09.tsv`. Done 9 Nov: #846 first, then the other 23. All 24 checked against the backup, all match.
 - [x] 0.3 `list_tickets` filters: `assignee`, `status` (`open`, `done`, codes), `tag` (exact or `prefix*`), `due_before`, `fields` (`compact` or a list). Built 9 Nov.
 - [x] 0.4 Tests with a fake RPC endpoint, no live writes: `uv run --group dev pytest`. 12 tests, 9 Nov.
 
