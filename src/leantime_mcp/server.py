@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from fastmcp import FastMCP
 
 from leantime_mcp.client import LeantimeClient, LeantimeAPIError
+from leantime_mcp.filters import filter_tickets, select_fields
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -99,11 +100,21 @@ async def get_ticket(ticket_id: int) -> str:
 
 
 @app.tool()
-async def list_tickets(project_id: int = None) -> str:
-    """List tickets, optionally filtered by project ID."""
+async def list_tickets(project_id: int = None, assignee: int = None, status: str = None,
+                       tag: str = None, due_before: str = None, fields: str = None) -> str:
+    """List tickets, optionally filtered.
+
+    project_id: one project. assignee: user id. status: "open", "done" or codes like "1,4"
+    (3 New, 4 In Progress, 1 Blocked, 2 Waiting for Approval, 0 Done, -1 Archived).
+    tag: exact tag or prefix with "*" (e.g. "top5-*"). due_before: YYYY-MM-DD.
+    fields: "compact" (id, headline, status, priority, assignee, due, tags, project, type)
+    or a comma-separated list. Without filters or fields you get every field of every
+    ticket (large): prefer status="open" and fields="compact"."""
     client = get_client()
     result = await client.list_tickets(project_id)
-    return json.dumps(result, indent=2)
+    tickets = filter_tickets(result or [], assignee=assignee, status=status, tag=tag,
+                             due_before=due_before)
+    return json.dumps(select_fields(tickets, fields), indent=2)
 
 
 @app.tool()
@@ -126,8 +137,10 @@ async def create_ticket(headline: str, project_id: int, user_id: int, date: str 
 @app.tool()
 async def update_ticket(ticket_id: int, project_id: int, headline: str = None, description: str = None,
                        status: int = None, priority: str = None, assignedTo: int = None, tags: str = None,
-                       dateToFinish: str = None) -> str:
-    """Update an existing ticket. dateToFinish is the due date, YYYY-MM-DD."""
+                       dateToFinish: str = None, created_date: str = None) -> str:
+    """Update an existing ticket. Only the fields you pass change; the created date is kept.
+    dateToFinish is the due date, YYYY-MM-DD. tags replaces the whole tag list, so pass the
+    existing tags plus yours. created_date (YYYY-MM-DD HH:MM:SS) only restores a lost created date."""
     client = get_client()
     kwargs = {}
     if headline is not None:
@@ -144,6 +157,8 @@ async def update_ticket(ticket_id: int, project_id: int, headline: str = None, d
         kwargs['tags'] = tags
     if dateToFinish is not None:
         kwargs['dateToFinish'] = dateToFinish
+    if created_date is not None:
+        kwargs['date'] = created_date
 
     result = await client.update_ticket(ticket_id, project_id, **kwargs)
     return json.dumps(result, indent=2)
