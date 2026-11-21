@@ -104,10 +104,12 @@ class LeantimeClient:
     
     async def create_project(self, name: str, details: Optional[str] = None, **kwargs) -> dict:
         """Create a new project."""
-        params = {"name": name, **kwargs}
+        # addProject takes a single `values` array, like addTicket. Flat params
+        # and null fields (clientId=None from the tool) are rejected with -32602.
+        values = {"name": name, **{k: v for k, v in kwargs.items() if v is not None}}
         if details:
-            params["details"] = details
-        return await self.call("leantime.rpc.Projects.addProject", params)
+            values["details"] = details
+        return await self.call("leantime.rpc.Projects.addProject", {"values": values})
     
     async def get_ticket(self, ticket_id: int) -> dict:
         """Get ticket details by ID."""
