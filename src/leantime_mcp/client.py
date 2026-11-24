@@ -219,10 +219,15 @@ class LeantimeClient:
         return await self.call("leantime.rpc.Comments.addComment", params)
     
     async def get_comments(self, module: str, module_id: int) -> list:
-        """Get comments for a module."""
+        """Get comments for a module.
+
+        Leantime's Comments::getComments($module, $entityId, ...) takes "entityId",
+        not "moduleId" (sending moduleId gives -32602 Invalid params). Module is
+        singular, e.g. "ticket".
+        """
         params = {
             "module": module,
-            "moduleId": module_id
+            "entityId": module_id
         }
         return await self.call("leantime.rpc.Comments.getComments", params)
     

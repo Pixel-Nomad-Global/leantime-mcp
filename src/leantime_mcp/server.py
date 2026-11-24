@@ -206,7 +206,7 @@ async def add_comment(module: str, module_id: int, comment: str) -> str:
 
 @app.tool()
 async def get_comments(module: str, module_id: int) -> str:
-    """Get comments for a module (ticket, project, etc.)."""
+    """Get comments for a module. module is singular: "ticket", "project", etc."""
     client = get_client()
     result = await client.get_comments(module=module, module_id=module_id)
     return json.dumps(result, indent=2)
